@@ -1,0 +1,12 @@
+# Install after requirements.txt, only when you're ready to enable real
+# external services (set the corresponding flags/credentials in .env):
+#
+#   pip install -r requirements.txt -r requirements-full.txt
+
+sentinelhub==3.10.2      # SENTINEL_HUB: real Sentinel-2 imagery
+geopandas==0.14.4        # SENTINEL_HUB: geospatial helpers
+torch==2.4.0             # QWEN_ENABLED: model runtime (GPU strongly recommended)
+transformers==4.44.2     # QWEN_ENABLED: Qwen2-VL loading/inference
+twilio==9.2.3            # TWILIO: real SMS dispatch
+google-cloud-texttospeech==2.17.2  # GOOGLE_CLOUD: real voice synthesis
+google-cloud-translate==3.16.0     # GOOGLE_CLOUD: real translation

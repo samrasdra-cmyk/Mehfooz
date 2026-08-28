@@ -286,13 +286,3 @@ This project is open-source and available under the MIT License.
 
 ---
 
-### The Bottom Line
-
-Samra, **this README is professional and complete.**
-
-- It explains the project clearly.
-- It lists all technologies.
-- It shows how to set everything up.
-- It looks great for the hackathon judges.
-
-**Add this to your GitHub repo now.** 🚀

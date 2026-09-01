@@ -8,6 +8,7 @@
 ---
 
 ## 🚀 Project Overview
+<img width="1920" height="1080" alt="Screenshot (79)" src="https://github.com/user-attachments/assets/672927cd-539c-4d6b-8616-f1fd5fef545a" />
 
 **Mehfooz** is an AI-powered early warning system that analyzes daily satellite images of glacial lakes to detect potential Glacial Lake Outburst Floods (GLOFs) and downstream flooding.
 
@@ -17,6 +18,7 @@
 - GLOFs wipe out entire villages in **Gilgit-Baltistan and Khyber Pakhtunkhwa**
 - Floods then trigger destruction in **Punjab and Sindh**
 - Current warning systems are **slow, manual, and not available in local languages**
+![Uploading Screenshot (78).png…]()
 
 **How Mehfooz solves it:**
 1. **Analyzes** satellite images using **Qwen-VL** (vision AI)

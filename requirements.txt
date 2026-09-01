@@ -1,14 +1,14 @@
-fastapi==0.115.0
-uvicorn[standard]==0.30.6
-celery==5.4.0
-redis==5.0.8
-sqlmodel==0.0.21
-psycopg2-binary==2.9.9  # needed only if DATABASE_URL points at Postgres (docker-compose default)
-python-dotenv==1.0.1
-pillow==10.4.0
-numpy==1.26.4
-requests==2.32.3
-pytest==8.3.2
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+celery>=5.4.0
+redis>=5.0.8
+sqlmodel>=0.0.21
+psycopg2-binary>=2.9.9  # needed only if DATABASE_URL points at Postgres (docker-compose default)
+python-dotenv>=1.0.1
+pillow>=10.4.0
+numpy>=1.26.4
+requests>=2.32.3
+pytest>=8.3.2
 
 # Real-service integrations live in requirements-full.txt (they're heavy:
 # torch/transformers alone is several GB). Install that file only once

@@ -9,7 +9,13 @@ from sqlmodel import SQLModel, Field, create_engine, Session
 
 from app.config import DATABASE_URL
 
-engine = create_engine(DATABASE_URL, echo=False)
+# Render provides DATABASE_URL starting with postgres://, which SQLAlchemy 1.4+ / SQLModel expects as postgresql://
+_db_url = DATABASE_URL
+if _db_url.startswith("postgres://"):
+    _db_url = _db_url.replace("postgres://", "postgresql://", 1)
+
+engine = create_engine(_db_url, echo=False)
+
 
 
 class AnalysisRecord(SQLModel, table=True):

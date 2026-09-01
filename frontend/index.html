@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mehfooz | AI Glacial Lake & Flood Early Warning System</title>
+    <meta name="description" content="AI-powered early warning system for floods and Glacial Lake Outburst Floods (GLOFs) in Northern Pakistan.">
+    
+    <!-- Google Fonts: Outfit & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&family=Noto+Nastaliq+Urdu:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons & Leaflet CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Top Navigation -->
+        <header class="app-header">
+            <div class="brand-section">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div class="brand-text">
+                    <h1>MEHFOOZ <span class="badge-tag">محفوظ</span></h1>
+                    <p class="subtitle">AI Flood & GLOF Early Warning System &bull; Northern Pakistan</p>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <div class="system-status-chip" id="systemStatusChip">
+                    <span class="status-dot pulsating"></span>
+                    <span id="systemStatusText">System Active &bull; Mock AI Mode</span>
+                </div>
+                <div class="time-display" id="currentTimeDisplay">
+                    <i class="fa-regular fa-clock"></i> <span id="liveClock">--:--:-- UTC</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Dashboard Grid -->
+        <main class="dashboard-grid">
+            <!-- Left Column: Controls & Monitoring -->
+            <section class="left-panel">
+                <!-- Region Selector Card -->
+                <div class="glass-card region-card">
+                    <div class="card-header">
+                        <div class="title-with-icon">
+                            <i class="fa-solid fa-mountain-sun text-accent"></i>
+                            <h3>Monitoring Target</h3>
+                        </div>
+                        <span class="region-count" id="regionCountBadge">2 Regions</span>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="regionSelect"><i class="fa-solid fa-location-crosshairs"></i> Target Valley / Glacial Lake</label>
+                            <select id="regionSelect" class="custom-select">
+                                <option value="shishper_lake">Shishper Glacial Lake (Hunza Valley)</option>
+                                <option value="passu_lake">Passu Glacial Lake (Gojal Valley)</option>
+                            </select>
+                        </div>
+
+                        <div class="region-meta-grid" id="regionMetaGrid">
+                            <div class="meta-item">
+                                <span class="meta-label">Coordinates</span>
+                                <span class="meta-val" id="regionCoords">36.20° N, 74.60° E</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Target Basin</span>
+                                <span class="meta-val" id="regionBasin">Hunza River Basin</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">SMS Subscribers</span>
+                                <span class="meta-val" id="regionRecipients">1 Emergency Line</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Altitude / Threat</span>
+                                <span class="meta-val highlight-amber" id="regionThreat">High GLOF Risk</span>
+                            </div>
+                        </div>
+
+                        <div class="trigger-box">
+                            <div class="date-picker-row">
+                                <label for="analysisDate"><i class="fa-regular fa-calendar"></i> Analysis Date</label>
+                                <input type="date" id="analysisDate" class="custom-input">
+                            </div>
+                            <button id="triggerBtn" class="btn-primary">
+                                <i class="fa-solid fa-satellite-dish"></i>
+                                <span>Run AI Pipeline Analysis</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Risk Assessment Card -->
+                <div class="glass-card risk-card">
+                    <div class="card-header">
+                        <div class="title-with-icon">
+                            <i class="fa-solid fa-triangle-exclamation text-warning"></i>
+                            <h3>GLOF Risk Evaluation</h3>
+                        </div>
+                        <span class="status-pill safe" id="riskLevelBadge">Low Risk</span>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="risk-gauge-container">
+                            <div class="gauge-dial">
+                                <svg viewBox="0 0 100 55" class="gauge-svg">
+                                    <path class="gauge-bg" d="M10,50 A40,40 0 0,1 90,50" />
+                                    <path class="gauge-fill" id="gaugeFill" d="M10,50 A40,40 0 0,1 90,50" />
+                                </svg>
+                                <div class="gauge-value-overlay">
+                                    <span class="score-number" id="riskScoreVal">0.29</span>
+                                    <span class="score-label">Risk Index (0.0 - 1.0)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="metrics-grid">
+                            <div class="metric-box">
+                                <div class="metric-icon"><i class="fa-solid fa-water"></i></div>
+                                <div class="metric-info">
+                                    <span class="metric-name">Lake Surface Area</span>
+                                    <span class="metric-value" id="lakeAreaVal">8.74 km²</span>
+                                </div>
+                            </div>
+                            <div class="metric-box">
+                                <div class="metric-icon"><i class="fa-solid fa-arrows-split-up-and-left"></i></div>
+                                <div class="metric-info">
+                                    <span class="metric-name">Outflow Channels</span>
+                                    <span class="metric-value" id="channelsVal">None Detected</span>
+                                </div>
+                            </div>
+                            <div class="metric-box">
+                                <div class="metric-icon"><i class="fa-solid fa-temperature-arrow-up"></i></div>
+                                <div class="metric-info">
+                                    <span class="metric-name">Snowmelt Rate</span>
+                                    <span class="metric-value" id="snowmeltVal">Low</span>
+                                </div>
+                            </div>
+                            <div class="metric-box">
+                                <div class="metric-icon"><i class="fa-solid fa-chart-line"></i></div>
+                                <div class="metric-info">
+                                    <span class="metric-name">Expansion Factor</span>
+                                    <span class="metric-value" id="expansionVal">1.00x</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ai-insight-box">
+                            <div class="insight-header">
+                                <i class="fa-solid fa-microchip"></i>
+                                <span>Vision-Language Scene Analysis</span>
+                            </div>
+                            <p class="insight-text" id="aiDescriptionText">
+                                Automated synthetic heuristic monitoring active. No critical dam breach anomalies detected in current imagery.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Center Column: Geospatial Map & Satellite View -->
+            <section class="center-panel">
+                <div class="glass-card map-card">
+                    <div class="card-header map-header">
+                        <div class="title-with-icon">
+                            <i class="fa-solid fa-map-location-dot text-cyan"></i>
+                            <h3>Interactive Basin Map & Hazard Zones</h3>
+                        </div>
+                        <div class="map-layer-controls">
+                            <button class="layer-btn active" id="btnLayerSat"><i class="fa-solid fa-earth-americas"></i> Satellite</button>
+                            <button class="layer-btn" id="btnLayerTopo"><i class="fa-solid fa-layer-group"></i> Terrain</button>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="pakistanMap" class="map-viewport"></div>
+                    </div>
+                </div>
+
+                <!-- Historical Trend Chart -->
+                <div class="glass-card chart-card">
+                    <div class="card-header">
+                        <div class="title-with-icon">
+                            <i class="fa-solid fa-chart-area text-accent"></i>
+                            <h3>Lake Expansion & Risk Timeline</h3>
+                        </div>
+                        <span class="refresh-indicator" id="historyCount">20 Data Points</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="trendChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Column: Multilingual Broadcast & Evacuation -->
+            <section class="right-panel">
+                <!-- Multilingual Alerts Broadcast Card -->
+                <div class="glass-card broadcast-card">
+                    <div class="card-header">
+                        <div class="title-with-icon">
+                            <i class="fa-solid fa-bullhorn text-accent"></i>
+                            <h3>Multilingual Alert Dispatch</h3>
+                        </div>
+                        <span class="badge-pulse" id="alertStateBadge">Standing By</span>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="lang-tabs">
+                            <button class="lang-tab active" data-lang="en">English</button>
+                            <button class="lang-tab" data-lang="ur">اردو (Urdu)</button>
+                            <button class="lang-tab" data-lang="sd">سنڌي (Sindhi)</button>
+                            <button class="lang-tab" data-lang="ps">پښتو (Pashto)</button>
+                        </div>
+
+                        <div class="alert-message-display" id="alertMessageDisplay">
+                            <div class="alert-lang-content" id="alertText">
+                                [English] All parameters within safe threshold for Shishper Glacial Lake. Regular observation continues.
+                            </div>
+                        </div>
+
+                        <div class="voice-synthesis-player">
+                            <div class="player-info">
+                                <i class="fa-solid fa-volume-high text-cyan"></i>
+                                <span>Voice Broadcast System</span>
+                            </div>
+                            <div class="player-controls">
+                                <button id="playVoiceBtn" class="btn-voice">
+                                    <i class="fa-solid fa-play"></i> <span>Play Audio Alert</span>
+                                </button>
+                                <span class="voice-status" id="voiceStatusText">Voice ready</span>
+                            </div>
+                        </div>
+
+                        <div class="sms-log-section">
+                            <span class="log-title"><i class="fa-solid fa-comment-sms"></i> SMS Fanout Dispatch</span>
+                            <div class="sms-feed" id="smsFeed">
+                                <div class="sms-item">
+                                    <div class="sms-head">
+                                        <span class="sms-to">+920000000001 (Hunza Emergency Cell)</span>
+                                        <span class="sms-time">Ready</span>
+                                    </div>
+                                    <div class="sms-body">System ready to dispatch alerts in 4 languages upon threshold breach.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Evacuation & Safe Zones Card -->
+                <div class="glass-card evac-card">
+                    <div class="card-header">
+                        <div class="title-with-icon">
+                            <i class="fa-solid fa-person-walking-arrow-right text-emerald"></i>
+                            <h3>Evacuation & Safe Corridors</h3>
+                        </div>
+                        <span class="shelter-badge">Karakoram Highway Zone</span>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="evac-route-box" id="evacRouteBox">
+                            <div class="evac-step">
+                                <div class="step-num">1</div>
+                                <div class="step-desc">
+                                    <strong>Move to High Ridge Points:</strong> Evacuate valley floor towards Aliabad / Karimabad ridges above 2,600m.
+                                </div>
+                            </div>
+                            <div class="evac-step">
+                                <div class="step-num">2</div>
+                                <div class="step-desc">
+                                    <strong>Avoid KKH Bridge Crossings:</strong> Karakoram Highway culverts near Hassanabad bridge are high hazard zones.
+                                </div>
+                            </div>
+                            <div class="evac-step">
+                                <div class="step-num">3</div>
+                                <div class="step-desc">
+                                    <strong>Emergency Contact:</strong> GBDMA Gilgit: 05811-920830 | NDMA Helpline: 1122
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toastNotification" class="toast hidden">
+        <i class="fa-solid fa-circle-check toast-icon"></i>
+        <div class="toast-content">
+            <strong id="toastTitle">Pipeline Completed</strong>
+            <p id="toastMessage">Analysis run successfully executed.</p>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

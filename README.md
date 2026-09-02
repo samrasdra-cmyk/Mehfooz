@@ -9,7 +9,7 @@
 ---
 
  🚀 Project Overview
-<img width="1920" height="1080" alt="Screenshot (79)" src="https://github.com/user-attachments/assets/672927cd-539c-4d6b-8616-f1fd5fef545a" />
+
 
 Mehfooz is an AI-powered early warning system that analyzes daily satellite images of glacial lakes to detect potential Glacial Lake Outburst Floods (GLOFs) and downstream flooding.
 
@@ -81,6 +81,7 @@ You will need API keys for the following services:
 git clone https://github.com/yourusername/mehfooz.git
 cd mehfooz
 ```
+<img width="1785" height="943" alt="Screenshot (79)" src="https://github.com/user-attachments/assets/b8fa5a83-74ee-4631-951d-55845e251a03" />
 
  2. Set Up Python Environment
 

@@ -1,3 +1,4 @@
+<img width="1890" height="948" alt="Screenshot (85)" src="https://github.com/user-attachments/assets/6b38c052-e205-447c-b168-635a54873ec4" />
 
 
 ```markdown
@@ -31,6 +32,7 @@ How Mehfooz solves it:
 5. Suggests evacuation routes to high-ground villages
 
 ---
+<img width="1785" height="943" alt="Screenshot (79)" src="https://github.com/user-attachments/assets/ae3a6247-b7f8-456d-ac82-510e147a7746" />
 
  🛠️ Tech Stack
 

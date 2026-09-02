@@ -32,7 +32,8 @@ How Mehfooz solves it:
 5. Suggests evacuation routes to high-ground villages
 
 ---
-<img width="1785" height="943" alt="Screenshot (79)" src="https://github.com/user-attachments/assets/ae3a6247-b7f8-456d-ac82-510e147a7746" />
+<img width="1785" height="943" alt="Screenshot (79)" src="https://github.com/user-attachments/assets/559dadf8-7087-46a1-961e-eed65ab12463" />
+
 
  🛠️ Tech Stack
 

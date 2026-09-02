@@ -1,26 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mehfooz | AI Glacial Lake & Flood Early Warning System</title>
-    <meta name="description" content="AI-powered early warning system for floods and Glacial Lake Outburst Floods (GLOFs) in Northern Pakistan.">
-    
+    <meta name="description"
+        content="AI-powered early warning system for floods and Glacial Lake Outburst Floods (GLOFs) in Northern Pakistan.">
+
     <!-- Google Fonts: Outfit & Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&family=Noto+Nastaliq+Urdu:wght@400;700&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&family=Noto+Nastaliq+Urdu:wght@400;700&display=swap"
+        rel="stylesheet">
+
     <!-- FontAwesome Icons & Leaflet CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    
+
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <link rel="stylesheet" href="/static/styles.css">
 </head>
+
 <body>
     <div class="app-container">
         <!-- Top Navigation -->
@@ -38,7 +43,7 @@
             <div class="header-actions">
                 <div class="system-status-chip" id="systemStatusChip">
                     <span class="status-dot pulsating"></span>
-                    <span id="systemStatusText">System Active &bull; Mock AI Mode</span>
+                    <span id="systemStatusText">System Active /span>
                 </div>
                 <div class="time-display" id="currentTimeDisplay">
                     <i class="fa-regular fa-clock"></i> <span id="liveClock">--:--:-- UTC</span>
@@ -62,7 +67,8 @@
 
                     <div class="card-body">
                         <div class="form-group">
-                            <label for="regionSelect"><i class="fa-solid fa-location-crosshairs"></i> Target Valley / Glacial Lake</label>
+                            <label for="regionSelect"><i class="fa-solid fa-location-crosshairs"></i> Target Valley /
+                                Glacial Lake</label>
                             <select id="regionSelect" class="custom-select">
                                 <option value="shishper_lake">Shishper Glacial Lake (Hunza Valley)</option>
                                 <option value="passu_lake">Passu Glacial Lake (Gojal Valley)</option>
@@ -162,7 +168,8 @@
                                 <span>Vision-Language Scene Analysis</span>
                             </div>
                             <p class="insight-text" id="aiDescriptionText">
-                                Automated synthetic heuristic monitoring active. No critical dam breach anomalies detected in current imagery.
+                                Automated synthetic heuristic monitoring active. No critical dam breach anomalies
+                                detected in current imagery.
                             </p>
                         </div>
                     </div>
@@ -178,8 +185,10 @@
                             <h3>Interactive Basin Map & Hazard Zones</h3>
                         </div>
                         <div class="map-layer-controls">
-                            <button class="layer-btn active" id="btnLayerSat"><i class="fa-solid fa-earth-americas"></i> Satellite</button>
-                            <button class="layer-btn" id="btnLayerTopo"><i class="fa-solid fa-layer-group"></i> Terrain</button>
+                            <button class="layer-btn active" id="btnLayerSat"><i class="fa-solid fa-earth-americas"></i>
+                                Satellite</button>
+                            <button class="layer-btn" id="btnLayerTopo"><i class="fa-solid fa-layer-group"></i>
+                                Terrain</button>
                         </div>
                     </div>
                     <div class="card-body p-0">
@@ -226,7 +235,8 @@
 
                         <div class="alert-message-display" id="alertMessageDisplay">
                             <div class="alert-lang-content" id="alertText">
-                                [English] All parameters within safe threshold for Shishper Glacial Lake. Regular observation continues.
+                                [English] All parameters within safe threshold for Shishper Glacial Lake. Regular
+                                observation continues.
                             </div>
                         </div>
 
@@ -251,7 +261,8 @@
                                         <span class="sms-to">+920000000001 (Hunza Emergency Cell)</span>
                                         <span class="sms-time">Ready</span>
                                     </div>
-                                    <div class="sms-body">System ready to dispatch alerts in 4 languages upon threshold breach.</div>
+                                    <div class="sms-body">System ready to dispatch alerts in 4 languages upon threshold
+                                        breach.</div>
                                 </div>
                             </div>
                         </div>
@@ -273,13 +284,15 @@
                             <div class="evac-step">
                                 <div class="step-num">1</div>
                                 <div class="step-desc">
-                                    <strong>Move to High Ridge Points:</strong> Evacuate valley floor towards Aliabad / Karimabad ridges above 2,600m.
+                                    <strong>Move to High Ridge Points:</strong> Evacuate valley floor towards Aliabad /
+                                    Karimabad ridges above 2,600m.
                                 </div>
                             </div>
                             <div class="evac-step">
                                 <div class="step-num">2</div>
                                 <div class="step-desc">
-                                    <strong>Avoid KKH Bridge Crossings:</strong> Karakoram Highway culverts near Hassanabad bridge are high hazard zones.
+                                    <strong>Avoid KKH Bridge Crossings:</strong> Karakoram Highway culverts near
+                                    Hassanabad bridge are high hazard zones.
                                 </div>
                             </div>
                             <div class="evac-step">
@@ -306,4 +319,5 @@
 
     <script src="/static/app.js"></script>
 </body>
+
 </html>

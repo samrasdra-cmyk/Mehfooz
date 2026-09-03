@@ -8,6 +8,8 @@ python-dotenv>=1.0.1
 pillow>=10.4.0
 numpy>=1.26.4
 requests>=2.32.3
+edge-tts>=6.1.9       # Free TTS: Microsoft neural voices (Urdu: ur-PK-UzmaNeural)
+gTTS>=2.5.1           # Free TTS fallback: Google Translate endpoint
 pytest>=8.3.2
 
 # Real-service integrations live in requirements-full.txt (they're heavy:

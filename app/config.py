@@ -28,6 +28,22 @@ GOOGLE_CLOUD_ENABLED = bool(GOOGLE_APPLICATION_CREDENTIALS) and os.path.exists(
     GOOGLE_APPLICATION_CREDENTIALS or ""
 )
 
+# --- TTS engine selection ---
+# "auto"  (default) – Google Cloud if available, else Edge TTS, else gTTS, else mock
+# "edge"  – force Edge TTS (Microsoft neural voices, free, no key)
+# "gtts"  – force gTTS (Google Translate endpoint, free, no key)
+# "mock"  – always use the stub (useful for testing)
+TTS_ENGINE = os.getenv("TTS_ENGINE", "auto").lower()
+
+# --- LibreTranslate (free, open-source translation fallback) ---
+# Public instance: https://libretranslate.com  (free API key, no credit card)
+# Self-hosted:     set LIBRETRANSLATE_URL=http://localhost:5000 after running
+#                  `docker run -p 5000:5000 libretranslate/libretranslate`
+# Set LIBRETRANSLATE_ENABLED=false to skip this tier entirely.
+LIBRETRANSLATE_URL = os.getenv("LIBRETRANSLATE_URL", "https://libretranslate.com")
+LIBRETRANSLATE_ENABLED = os.getenv("LIBRETRANSLATE_ENABLED", "true").lower() == "true"
+LIBRETRANSLATE_API_KEY = os.getenv("LIBRETRANSLATE_API_KEY", "")  # required for libretranslate.com; empty for self-hosted
+
 # --- Twilio ---
 TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")

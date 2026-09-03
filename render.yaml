@@ -14,6 +14,20 @@ services:
           name: mehfooz-redis
           type: redis
           property: connectionString
+      # LibreTranslate – free tier on libretranslate.com requires an API key.
+      # Get one free at https://libretranslate.com (sign up, no credit card).
+      # To self-host on Render instead: deploy libretranslate/libretranslate as
+      # a separate Web Service and point LIBRETRANSLATE_URL at its internal URL.
+      - key: LIBRETRANSLATE_URL
+        value: https://libretranslate.com
+      - key: LIBRETRANSLATE_ENABLED
+        value: "true"
+      - key: LIBRETRANSLATE_API_KEY
+        sync: false   # set this secret in the Render dashboard → Environment
+      # TTS: use Edge TTS (free Microsoft neural voices, no API key needed)
+      # Change to "gtts" if Edge TTS has cold-start issues, or "auto" to try Google Cloud first.
+      - key: TTS_ENGINE
+        value: edge
 
   - type: worker
     name: mehfooz-worker
@@ -30,6 +44,14 @@ services:
           name: mehfooz-redis
           type: redis
           property: connectionString
+      - key: LIBRETRANSLATE_URL
+        value: https://libretranslate.com
+      - key: LIBRETRANSLATE_ENABLED
+        value: "true"
+      - key: LIBRETRANSLATE_API_KEY
+        sync: false   # set this secret in the Render dashboard → Environment
+      - key: TTS_ENGINE
+        value: edge
 
 databases:
   - name: mehfooz-db

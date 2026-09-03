@@ -18,10 +18,20 @@ def fetch_satellite_image(region_id: str, bbox_coords, date: str) -> str:
     date: 'YYYY-MM-DD'
     Returns the local path of the saved image.
     """
+    import logging
+    logger = logging.getLogger("mehfooz.satellite")
+
     output_path = os.path.join(DATA_DIR, f"{region_id}_{date}.png")
 
     if SENTINEL_HUB_ENABLED:
-        return _fetch_real(bbox_coords, date, output_path)
+        try:
+            return _fetch_real(bbox_coords, date, output_path)
+        except ImportError:
+            logger.warning(
+                "SH_CLIENT_ID/SECRET are set but the 'sentinelhub' package is not "
+                "installed. Falling back to mock mode. "
+                "Install it with: pip install sentinelhub geopandas"
+            )
     return _fetch_mock(region_id, output_path)
 
 

@@ -4,15 +4,18 @@ Voice alert synthesis
 1. **Google Cloud TTS** (real mode)
    Requires GOOGLE_APPLICATION_CREDENTIALS. Best quality, billed per character.
 
-2. **Edge TTS** (Urdu, Pashto, English)
+2. **Indic Parler-TTS** (Urdu, Sindhi)
+   Open-source model accessed through the public AI4Bharat Hugging Face Space.
+
+3. **Edge TTS** (Urdu fallback, Pashto, English)
    Uses Microsoft neural voices via edge-tts; no API key is needed.
    Install: pip install edge-tts
 
-3. **gTTS** (free, no API key – Google Translate TTS endpoint)
+4. **gTTS** (free, no API key – Google Translate TTS endpoint)
    Fallback for English and Urdu if Edge TTS is unavailable.
    Install: pip install gTTS
 
-4. **Mock passthrough** (offline / demo mode)
+5. **Mock passthrough** (offline / demo mode)
    Writes a .txt stub so the rest of the pipeline has a real path to log/serve.
 """
 import asyncio
@@ -68,8 +71,16 @@ def synthesize_voice(text: str, language_code: str, output_filename: str) -> str
     output_path = os.path.join(DATA_DIR, output_filename)
     os.makedirs(DATA_DIR, exist_ok=True)
 
-    # Don't present Urdu fallback audio as Sindhi.
+    # Use the open Indic model for Sindhi. Don't label Urdu fallback audio as
+    # Sindhi if the model service is unavailable.
     if _normalize(language_code) in {"sd", "sd-in"}:
+        try:
+            audio = _synthesize_indic_parler(text, _normalize(language_code))
+            with open(output_path, "wb") as f:
+                f.write(audio)
+            return output_path
+        except Exception as exc:
+            logger.warning("Indic Parler TTS unavailable for Sindhi: %s", exc)
         return _synthesize_mock(text, language_code, output_path)
 
     if GOOGLE_CLOUD_ENABLED and TTS_ENGINE != "edge" and TTS_ENGINE != "gtts":
@@ -186,8 +197,16 @@ def _synthesize_gtts(text: str, language_code: str, output_path: str) -> str | N
 async def synthesize_audio(text: str, language_code: str) -> tuple[bytes, str]:
     """Generate playable audio bytes for the dashboard speech button."""
     language = _normalize(language_code)
-    if language in {"sd", "sd-in"}:
-        raise RuntimeError("No server-side Sindhi speech voice is configured")
+    if language in {"ur", "ur-in", "ur-pk", "sd", "sd-in"}:
+        try:
+            audio = await asyncio.to_thread(_synthesize_indic_parler, text, language)
+            return audio, "audio/mpeg"
+        except Exception as exc:
+            logger.warning("Indic Parler TTS unavailable for %s: %s", language, exc)
+            # Urdu has the local Edge voice as a no-key fallback. For Sindhi,
+            # let the frontend try a Sindhi voice installed on the device.
+            if language in {"sd", "sd-in"}:
+                raise RuntimeError("Open Sindhi TTS demo is currently unavailable") from exc
 
     voice = EDGE_VOICES.get(language)
     if not voice:
@@ -203,6 +222,31 @@ async def synthesize_audio(text: str, language_code: str) -> tuple[bytes, str]:
     if not audio:
         raise RuntimeError("Speech provider returned empty audio")
     return audio, "audio/mpeg"
+
+
+def _synthesize_indic_parler(text: str, language: str) -> bytes:
+    """Call the public AI4Bharat Indic Parler-TTS Space and return its MP3."""
+    from gradio_client import Client
+
+    language_name = "Sindhi" if language in {"sd", "sd-in"} else "Urdu"
+    caption = (
+        f"A female speaker reads the text clearly and calmly in {language_name}. "
+        "Use a natural speaking pace and very clear audio."
+    )
+    client = Client("ai4bharat/indic-parler-tts", verbose=False)
+    result = client.submit(text, caption, api_name="/generate_finetuned").result(timeout=120)
+    candidates = list(result) if isinstance(result, (list, tuple)) else [result]
+
+    for candidate in candidates:
+        if isinstance(candidate, bytes):
+            return candidate
+        if isinstance(candidate, dict):
+            candidate = candidate.get("path") or candidate.get("name") or candidate.get("url")
+        if isinstance(candidate, str) and os.path.isfile(candidate):
+            with open(candidate, "rb") as audio_file:
+                return audio_file.read()
+
+    raise RuntimeError("Indic Parler-TTS returned no audio file")
 
 
 def _synthesize_mock(text: str, language_code: str, output_path: str) -> str:

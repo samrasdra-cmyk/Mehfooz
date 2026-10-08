@@ -9,7 +9,8 @@ python-dotenv>=1.0.1
 pillow>=10.4.0
 numpy>=1.26.4
 requests>=2.32.3
-edge-tts>=6.1.9       # Free TTS: Microsoft neural voices (Urdu: ur-PK-UzmaNeural)
+edge-tts>=6.1.9       # No-key fallback TTS: Microsoft neural voices
+gradio_client>=1.7.0  # Open-source Urdu/Sindhi TTS via the public AI4Bharat model Space
 gTTS>=2.5.1           # Free TTS fallback: Google Translate endpoint
 pytest>=8.3.2
 

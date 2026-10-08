@@ -124,9 +124,12 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx
 MOCK_MODE=true
 ```
 
-Urdu and Pashto use Edge TTS without an API key. Sindhi uses a voice installed
-on the visitor's device when available; hosted Sindhi TTS needs a separate
-provider or API key.
+Urdu and Sindhi use the open-source AI4Bharat Indic Parler-TTS model through
+its public Hugging Face Space; no API key is needed. The shared free demo can
+be busy or unavailable. Sindhi then falls back to a matching voice installed
+on the visitor's device, if available. Pashto uses the no-key Edge TTS voice.
+The selected alert text is sent to the Hugging Face Space for Urdu/Sindhi
+audio generation.
 
  5. Run the Application
 

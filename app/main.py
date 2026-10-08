@@ -108,12 +108,6 @@ async def speech(payload: SpeechRequest, request: Request):
     """Generate a short multilingual alert audio clip."""
     if payload.language_code not in {"en", "ur", "sd", "ps"}:
         raise HTTPException(status_code=400, detail="Choose English, Urdu, Sindhi, or Pashto")
-    if payload.language_code == "sd":
-        raise HTTPException(
-            status_code=501,
-            detail="No server-side free Sindhi voice is configured; trying a voice installed on your device.",
-        )
-
     # Keep the free TTS endpoint from being spammed from one client.
     client_ip = request.client.host if request.client else "unknown"
     recent = speech_requests[client_ip]

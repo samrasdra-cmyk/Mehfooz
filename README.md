@@ -124,6 +124,10 @@ TWILIO_PHONE_NUMBER=+1xxxxxxxxxx
 MOCK_MODE=true
 ```
 
+Urdu and Pashto use Edge TTS without an API key. Sindhi uses a voice installed
+on the visitor's device when available; hosted Sindhi TTS needs a separate
+provider or API key.
+
  5. Run the Application
 
 ```bash

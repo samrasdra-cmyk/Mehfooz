@@ -8,20 +8,25 @@ Run locally:
 """
 import os
 import logging
+import time
+from collections import defaultdict, deque
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, Response
+from pydantic import BaseModel, Field
 
 from app.pipeline import run_pipeline
 from app.regions import REGIONS
 from app.database import init_db, get_recent_records
 from app.config import DATA_DIR
+from app.tts import synthesize_audio
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("mehfooz")
+speech_requests = defaultdict(deque)
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 FRONTEND_DIR = BASE_DIR / "frontend"
@@ -91,6 +96,44 @@ def history(region_id: str, limit: int = 20):
         raise HTTPException(status_code=404, detail=f"Unknown region_id '{region_id}'")
     records = get_recent_records(region_id=region_id, limit=limit)
     return records
+
+
+class SpeechRequest(BaseModel):
+    language_code: str = Field(min_length=2, max_length=5)
+    text: str = Field(min_length=1, max_length=1500)
+
+
+@app.post("/speech")
+async def speech(payload: SpeechRequest, request: Request):
+    """Generate a short multilingual alert audio clip."""
+    if payload.language_code not in {"en", "ur", "sd", "ps"}:
+        raise HTTPException(status_code=400, detail="Choose English, Urdu, Sindhi, or Pashto")
+    if payload.language_code == "sd":
+        raise HTTPException(
+            status_code=501,
+            detail="No server-side free Sindhi voice is configured; trying a voice installed on your device.",
+        )
+
+    # Keep the free TTS endpoint from being spammed from one client.
+    client_ip = request.client.host if request.client else "unknown"
+    recent = speech_requests[client_ip]
+    now = time.monotonic()
+    while recent and now - recent[0] > 60:
+        recent.popleft()
+    if len(recent) >= 12:
+        raise HTTPException(status_code=429, detail="Please wait before requesting more audio")
+    recent.append(now)
+
+    try:
+        audio, media_type = await synthesize_audio(payload.text, payload.language_code)
+    except RuntimeError as exc:
+        logger.exception("Speech generation failed")
+        raise HTTPException(status_code=502, detail="Speech generation failed") from exc
+    except Exception as exc:
+        logger.exception("Speech generation failed")
+        raise HTTPException(status_code=502, detail="Speech generation failed; try again") from exc
+
+    return Response(content=audio, media_type=media_type)
 
 
 # Serve dashboard on root and /dashboard if frontend directory exists

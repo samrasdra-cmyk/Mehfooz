@@ -379,42 +379,100 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // Voice Synthesis Playback (Web Speech API)
-    playVoiceBtn.addEventListener("click", () => {
-        if (!('speechSynthesis' in window)) {
-            voiceStatusText.textContent = "Audio speech unavailable";
-            return;
+    // Generate a real speech file on the server so playback does not depend
+    // on which language voices happen to be installed on the visitor's device.
+    let activeSpeechAudio = null;
+    let activeSpeechUrl = null;
+    async function findInstalledVoice(languageCode) {
+        if (!("speechSynthesis" in window)) return null;
+        let voices = window.speechSynthesis.getVoices();
+        if (!voices.length) {
+            await new Promise(resolve => {
+                const timeout = setTimeout(resolve, 1200);
+                window.speechSynthesis.addEventListener("voiceschanged", () => {
+                    clearTimeout(timeout);
+                    resolve();
+                }, { once: true });
+            });
+            voices = window.speechSynthesis.getVoices();
+        }
+        return voices.find(voice => voice.lang.toLowerCase().startsWith(`${languageCode}-`)) || null;
+    }
+
+    playVoiceBtn.addEventListener("click", async () => {
+        if (activeSpeechAudio) {
+            activeSpeechAudio.pause();
+            activeSpeechAudio = null;
+        }
+        if (activeSpeechUrl) {
+            URL.revokeObjectURL(activeSpeechUrl);
+            activeSpeechUrl = null;
         }
 
-        window.speechSynthesis.cancel();
-        const textToSpeak = alertText.textContent;
-        const utterance = new SpeechSynthesisUtterance(textToSpeak);
+        playVoiceBtn.disabled = true;
+        voiceStatusText.textContent = "Generating audio...";
+        try {
+            const response = await fetch("/speech", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    language_code: state.currentLang,
+                    text: alertText.textContent
+                })
+            });
+            if (!response.ok) {
+                const error = await response.json().catch(() => ({}));
+                throw new Error(error.detail || "Audio generation failed");
+            }
 
-        const langMap = {
-            en: 'en-US',
-            ur: 'ur-PK',
-            sd: 'sd-PK',
-            ps: 'ps-AF'
-        };
-        utterance.lang = langMap[state.currentLang] || 'en-US';
-        utterance.rate = 0.95;
-
-        utterance.onstart = () => {
-            voiceStatusText.textContent = "Broadcasting alert audio...";
+            activeSpeechUrl = URL.createObjectURL(await response.blob());
+            activeSpeechAudio = new Audio(activeSpeechUrl);
+            activeSpeechAudio.onended = () => {
+                voiceStatusText.textContent = "Playback finished";
+                playVoiceBtn.classList.remove("pulse");
+                URL.revokeObjectURL(activeSpeechUrl);
+                activeSpeechUrl = null;
+                activeSpeechAudio = null;
+            };
+            activeSpeechAudio.onerror = () => {
+                voiceStatusText.textContent = "Audio playback failed";
+                playVoiceBtn.classList.remove("pulse");
+            };
+            await activeSpeechAudio.play();
+            voiceStatusText.textContent = "Playing alert audio...";
             playVoiceBtn.classList.add("pulse");
-        };
-
-        utterance.onend = () => {
-            voiceStatusText.textContent = "Broadcast finished";
+        } catch (error) {
             playVoiceBtn.classList.remove("pulse");
-        };
-
-        utterance.onerror = () => {
-            voiceStatusText.textContent = "Playback error";
-            playVoiceBtn.classList.remove("pulse");
-        };
-
-        window.speechSynthesis.speak(utterance);
+            if (state.currentLang === "sd") {
+                const localVoice = await findInstalledVoice("sd");
+                if (localVoice) {
+                    const utterance = new SpeechSynthesisUtterance(alertText.textContent);
+                    utterance.voice = localVoice;
+                    utterance.lang = localVoice.lang;
+                    utterance.rate = 0.92;
+                    utterance.onstart = () => {
+                        voiceStatusText.textContent = "Playing device Sindhi voice...";
+                        playVoiceBtn.classList.add("pulse");
+                    };
+                    utterance.onend = () => {
+                        voiceStatusText.textContent = "Playback finished";
+                        playVoiceBtn.classList.remove("pulse");
+                    };
+                    utterance.onerror = () => {
+                        voiceStatusText.textContent = "Device Sindhi voice failed";
+                        playVoiceBtn.classList.remove("pulse");
+                    };
+                    window.speechSynthesis.cancel();
+                    window.speechSynthesis.speak(utterance);
+                    return;
+                }
+                voiceStatusText.textContent = "No Sindhi voice installed on this device";
+            } else {
+                voiceStatusText.textContent = error.message || "Audio unavailable";
+            }
+        } finally {
+            playVoiceBtn.disabled = false;
+        }
     });
 
     // Toast Function

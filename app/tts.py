@@ -1,17 +1,15 @@
 """
-Voice alert synthesis  –  four-tier strategy
+Voice alert synthesis
 =============================================
 1. **Google Cloud TTS** (real mode)
    Requires GOOGLE_APPLICATION_CREDENTIALS. Best quality, billed per character.
 
-2. **Edge TTS** (free, no API key – Microsoft Azure neural voices via edge-tts)
-   Supports Urdu (ur-PK-UzmaNeural), Sindhi, Pashto.
-   Works on Render free plan – no credentials, no limits, no rate-limiting.
+2. **Edge TTS** (Urdu, Pashto, English)
+   Uses Microsoft neural voices via edge-tts; no API key is needed.
    Install: pip install edge-tts
 
 3. **gTTS** (free, no API key – Google Translate TTS endpoint)
-   Simpler fallback if Edge TTS is unavailable.
-   Supports Urdu; Sindhi/Pashto support varies.
+   Fallback for English and Urdu if Edge TTS is unavailable.
    Install: pip install gTTS
 
 4. **Mock passthrough** (offline / demo mode)
@@ -32,24 +30,22 @@ logger = logging.getLogger("mehfooz.tts")
 # Edge TTS voice names per language.
 # Full voice list: `edge-tts --list-voices`
 EDGE_VOICES: dict[str, str] = {
+    "en":    "en-US-AriaNeural",
+    "en-us": "en-US-AriaNeural",
     "ur":    "ur-PK-UzmaNeural",      # Urdu (Pakistan) – female neural voice
     "ur-in": "ur-PK-UzmaNeural",      # BCP-47 alias used by the pipeline
     "ur-pk": "ur-PK-UzmaNeural",
-    "sd":    "ur-PK-UzmaNeural",      # No dedicated Sindhi voice on Edge TTS; best approximation
-    "sd-in": "ur-PK-UzmaNeural",
-    "ps":    "ur-PK-UzmaNeural",      # No Pashto voice on Edge TTS; Urdu is closest
-    "ps-af": "ur-PK-UzmaNeural",
+    "ps":    "ps-AF-LatifaNeural",    # Pashto (Afghanistan) – female neural voice
+    "ps-af": "ps-AF-LatifaNeural",
 }
 
 # gTTS language codes (BCP-47 → gTTS lang tag)
 GTTS_LANGS: dict[str, str] = {
+    "en":    "en",
+    "en-us": "en",
     "ur":    "ur",
     "ur-in": "ur",
     "ur-pk": "ur",
-    "sd":    "ur",   # gTTS has no Sindhi; use Urdu as fallback
-    "sd-in": "ur",
-    "ps":    "ur",   # gTTS has no Pashto; use Urdu as fallback
-    "ps-af": "ur",
 }
 
 
@@ -71,6 +67,10 @@ def synthesize_voice(text: str, language_code: str, output_filename: str) -> str
     """
     output_path = os.path.join(DATA_DIR, output_filename)
     os.makedirs(DATA_DIR, exist_ok=True)
+
+    # Don't present Urdu fallback audio as Sindhi.
+    if _normalize(language_code) in {"sd", "sd-in"}:
+        return _synthesize_mock(text, language_code, output_path)
 
     if GOOGLE_CLOUD_ENABLED and TTS_ENGINE != "edge" and TTS_ENGINE != "gtts":
         logger.debug("TTS: using Google Cloud")
@@ -166,7 +166,10 @@ def _synthesize_gtts(text: str, language_code: str, output_path: str) -> str | N
         logger.info("gTTS not installed; skipping gTTS tier")
         return None
 
-    lang = GTTS_LANGS.get(_normalize(language_code), "ur")
+    lang = GTTS_LANGS.get(_normalize(language_code))
+    if not lang:
+        logger.info("gTTS has no configured voice for lang=%s", language_code)
+        return None
     logger.info("gTTS: lang=%s (requested=%s)", lang, language_code)
 
     try:
@@ -178,6 +181,28 @@ def _synthesize_gtts(text: str, language_code: str, output_path: str) -> str | N
     except Exception as exc:
         logger.error("gTTS error: %s", exc)
         return None
+
+
+async def synthesize_audio(text: str, language_code: str) -> tuple[bytes, str]:
+    """Generate playable audio bytes for the dashboard speech button."""
+    language = _normalize(language_code)
+    if language in {"sd", "sd-in"}:
+        raise RuntimeError("No server-side Sindhi speech voice is configured")
+
+    voice = EDGE_VOICES.get(language)
+    if not voice:
+        raise ValueError("Unsupported speech language")
+
+    import edge_tts
+
+    audio_chunks = []
+    async for packet in edge_tts.Communicate(text, voice).stream():
+        if packet.get("type") == "audio":
+            audio_chunks.append(packet["data"])
+    audio = b"".join(audio_chunks)
+    if not audio:
+        raise RuntimeError("Speech provider returned empty audio")
+    return audio, "audio/mpeg"
 
 
 def _synthesize_mock(text: str, language_code: str, output_path: str) -> str:

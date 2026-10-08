@@ -1,4 +1,4 @@
-<img width="1890" height="948" alt="Screenshot (85)" src="https://github.com/user-attachments/assets/6b38c052-e205-447c-b168-635a54873ec4" />
+<img width="1877" height="921" alt="Screenshot (87)" src="https://github.com/user-attachments/assets/505278ab-568a-4dbe-93c7-74c00c0b9ffc" />
 
 
 ```markdown
@@ -32,7 +32,8 @@ How Mehfooz solves it:
 5. Suggests evacuation routes to high-ground villages
 
 ---
-<img width="1785" height="943" alt="Screenshot (79)" src="https://github.com/user-attachments/assets/559dadf8-7087-46a1-961e-eed65ab12463" />
+
+
 
 
  🛠️ Tech Stack
@@ -81,7 +82,8 @@ You will need API keys for the following services:
 git clone https://github.com/yourusername/mehfooz.git
 cd mehfooz
 ```
-<img width="1785" height="943" alt="Screenshot (79)" src="https://github.com/user-attachments/assets/b8fa5a83-74ee-4631-951d-55845e251a03" />
+<img width="1920" height="911" alt="Screenshot (90)" src="https://github.com/user-attachments/assets/fa5bcdc3-55e3-494b-b6fa-379dc81c7e9e" />
+
 
  2. Set Up Python Environment
 
@@ -96,6 +98,7 @@ pip install -r requirements.txt
 ```bash
 npm install
 ```
+<img width="1920" height="911" alt="Screenshot (89)" src="https://github.com/user-attachments/assets/402cece6-041f-479f-a32c-91d5b11d33b3" />
 
  4. Create Environment Variables
 
@@ -178,6 +181,7 @@ mehfooz/
 ```
 
 ---
+<img width="1920" height="960" alt="Screenshot (88)" src="https://github.com/user-attachments/assets/f1e19d9d-dc18-43d5-b67b-8643c7c07beb" />
 
  🚀 Deployment (Alibaba Cloud)
 
@@ -261,34 +265,4 @@ This project is open-source and available under the MIT License.
 
 Built with ❤️ for Pakistan's future.
 ```
-
----
-
- What This README Does
-
-| Section | Purpose |
-| :--- | :--- |
-| Project Overview | Explains the problem and solution |
-| Tech Stack | Lists all technologies used |
-| Prerequisites | Tells users what they need to start |
-| API Keys | Shows where to get each key |
-| Installation | Step-by-step setup instructions |
-| Architecture Flow | Visual representation of the system |
-| Project Structure | Explains the folder layout |
-| Deployment | How to deploy on Alibaba Cloud |
-| Demo Mode | How to test without live APIs |
-| Quick Commands | Handy command reference |
-
----
-
- What to Do Now
-
-| Step | Action |
-| :--- | :--- |
-| 1 | Create a new file called `README.md` in your project root. |
-| 2 | Copy-paste the content above into it. |
-| 3 | Replace `https://github.com/yourusername/mehfooz.git` with your actual GitHub repo URL. |
-| 4 | Commit and push to GitHub. |
-
----
 

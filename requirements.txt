@@ -4,6 +4,7 @@ celery>=5.4.0
 redis>=5.0.8
 sqlmodel>=0.0.21
 psycopg2-binary>=2.9.9  # needed only if DATABASE_URL points at Postgres (docker-compose default)
+psycopg[binary]>=3.2.1  # needed when DATABASE_URL uses the postgresql+psycopg:// driver
 python-dotenv>=1.0.1
 pillow>=10.4.0
 numpy>=1.26.4

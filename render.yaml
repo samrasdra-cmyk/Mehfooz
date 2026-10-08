@@ -6,9 +6,7 @@ services:
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: DATABASE_URL
-        fromDatabase:
-          name: mehfooz-db
-          property: connectionString
+        sync: false
       - key: REDIS_URL
         fromService:
           name: mehfooz-redis
@@ -36,9 +34,7 @@ services:
     startCommand: celery -A app.tasks worker --loglevel=info
     envVars:
       - key: DATABASE_URL
-        fromDatabase:
-          name: mehfooz-db
-          property: connectionString
+        sync: false
       - key: REDIS_URL
         fromService:
           name: mehfooz-redis
@@ -52,10 +48,6 @@ services:
         sync: false   # set this secret in the Render dashboard → Environment
       - key: TTS_ENGINE
         value: edge
-
-databases:
-  - name: mehfooz-db
-    plan: free
 
 redis:
   - name: mehfooz-redis

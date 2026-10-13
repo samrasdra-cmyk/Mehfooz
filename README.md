@@ -20,7 +20,6 @@ Why this matters:
 - GLOFs wipe out entire villages in Gilgit-Baltistan and Khyber Pakhtunkhwa
 - Floods then trigger destruction in Punjab and Sindh
 - Current warning systems are slow, manual, and not available in local languages
-![Uploading Screenshot (78).png…]()
 
 How Mehfooz solves it:
 1. Analyzes satellite images using Qwen-VL (vision AI)

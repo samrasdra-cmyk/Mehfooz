@@ -2,7 +2,7 @@
 Lightweight persistence layer. Uses SQLite by default (via SQLModel), which
 needs zero setup; point DATABASE_URL at Postgres for production.
 """
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 from sqlmodel import SQLModel, Field, create_engine, Session
@@ -21,7 +21,7 @@ engine = create_engine(_db_url, echo=False)
 class AnalysisRecord(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     region_id: str
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     image_path: str
     lake_area_km2: float
     new_channels: bool

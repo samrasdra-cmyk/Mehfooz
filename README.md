@@ -1,7 +1,7 @@
 <img width="1877" height="921" alt="Screenshot (87)" src="https://github.com/user-attachments/assets/505278ab-568a-4dbe-93c7-74c00c0b9ffc" />
 
 
-```markdown
+
  Mehfooz – AI for Flood & Glacial Lake Outburst (GLOF) Early Warning
 
 > Pakistan has over 7,000 glaciers—the most outside the poles. When they melt, they form dangerous glacial lakes that can burst (GLOF), wiping out entire villages. Mehfooz uses AI to detect these risks early and send life-saving alerts in local languages.

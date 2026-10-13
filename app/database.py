@@ -5,6 +5,9 @@ needs zero setup; point DATABASE_URL at Postgres for production.
 from datetime import datetime, timezone
 from typing import Optional
 
+# We need to import Column and DateTime directly from SQLAlchemy
+# to explicitly force PostgreSQL to use timezone-aware columns.
+from sqlalchemy import Column, DateTime
 from sqlmodel import SQLModel, Field, create_engine, Session
 
 from app.config import DATABASE_URL
@@ -17,11 +20,17 @@ if _db_url.startswith("postgres://"):
 engine = create_engine(_db_url, echo=False)
 
 
-
 class AnalysisRecord(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     region_id: str
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    
+    # ✅ THE FIX: Explicitly define the SQLAlchemy column as TIMESTAMP WITH TIME ZONE.
+    # This ensures the database schema matches the timezone-aware Python datetime.
+    timestamp: datetime = Field(
+        sa_column=Column(DateTime(timezone=True)),
+        default_factory=lambda: datetime.now(timezone.utc)
+    )
+    
     image_path: str
     lake_area_km2: float
     new_channels: bool
